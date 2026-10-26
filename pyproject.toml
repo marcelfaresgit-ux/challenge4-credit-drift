@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fiap-credit-drift"
+version = "0.1.0"
+description = "Data quality and model drift observability for credit scoring"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+  "pandas>=2.2,<3.0",
+  "numpy>=1.26,<3.0",
+  "scikit-learn>=1.5,<2.0",
+  "pandera[pandas]>=0.22,<0.30",
+  "evidently>=0.7.19,<0.8",
+  "scipy>=1.13,<2.0",
+  "joblib>=1.4,<2.0",
+]
+
+[project.optional-dependencies]
+dev = ["ruff>=0.9,<1.0"]
+dashboard = ["streamlit>=1.40,<2.0", "plotly>=5.24,<7.0"]
+kaggle = ["kaggle>=1.6,<2.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
