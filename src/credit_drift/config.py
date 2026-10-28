@@ -2,8 +2,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 RAW_DATA = ROOT / "data" / "raw" / "application_train.csv"
-PROCESSED_DIR = ROOT / "data" / "processed"
-ARTIFACTS_DIR = ROOT / "data" / "artifacts"
 REPORTS_DIR = ROOT / "reports" / "generated"
 LOGS_DIR = ROOT / "logs"
 

@@ -30,8 +30,6 @@ Este projeto acompanha um classificador simples de risco de crédito desde a val
 ```text
 .
 |-- data/raw/                 # arquivo do Kaggle, fora do Git
-|-- data/processed/           # reservado para dados derivados, fora do Git
-|-- data/artifacts/           # reservado para modelo serializado, fora do Git
 |-- docs/                     # fonte de dados e governança
 |-- logs/                     # eventos JSONL, fora do Git
 |-- monitoring/               # painel Streamlit
