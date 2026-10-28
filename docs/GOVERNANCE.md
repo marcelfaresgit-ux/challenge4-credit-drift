@@ -26,4 +26,4 @@ O dataset contém atributos demográficos e proxies socioeconômicos. Eles podem
 
 ## Retenção do projeto
 
-`data/raw/`, resultados intermediários e logs locais são ignorados pelo Git. O README e este documento registram finalidade, campos, processamento e limitações para que a avaliação seja reproduzível sem publicar registros individuais.
+`data/raw/`, resultados intermediários e logs locais são ignorados pelo Git. Apenas o relatório de drift e métricas agregadas ficam versionados; não incluem registros de clientes. O README e este documento registram finalidade, campos, processamento e limitações para que a avaliação seja reproduzível sem publicar linhas individuais.

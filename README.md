@@ -1,6 +1,6 @@
 # Tech Challenge Fase 4 - Observabilidade de Credit Scoring
 
-Projeto end-to-end para sustentar um classificador de risco de crédito com contratos de qualidade, simulação de data/concept drift, monitoramento e documentação de governança. O cenário usa o dataset Home Credit Default Risk, conforme uma das fontes indicadas no enunciado.
+Este projeto acompanha um classificador simples de risco de crédito desde a validação dos dados até a análise de drift. A proposta é mostrar o que acontece quando o lote recebido deixa de se parecer com os dados usados no treino e como isso aparece nas métricas. Para os dados de referência usamos `application_train.csv`, da competição Home Credit Default Risk.
 
 > **Uso acadêmico:** os dados de produção e a mudança de conceito são simulados. Este modelo não deve apoiar decisões reais de crédito.
 
@@ -35,7 +35,7 @@ Projeto end-to-end para sustentar um classificador de risco de crédito com cont
 |-- docs/                     # fonte de dados e governança
 |-- logs/                     # eventos JSONL, fora do Git
 |-- monitoring/               # painel Streamlit
-|-- reports/generated/        # HTML, estatísticas e métricas, fora do Git
+|-- reports/generated/        # relatório HTML e métricas agregadas versionados
 |-- scripts/                  # setup, download e execução no Windows
 |-- src/credit_drift/         # pipeline, contrato, modelo e detecção
 `-- pyproject.toml
@@ -66,6 +66,50 @@ Com as credenciais da sua própria conta Kaggle configuradas:
 ```
 
 Também é possível baixar o arquivo pela interface web e salvá-lo em `data/raw/application_train.csv`. O arquivo bruto e as credenciais são ignorados pelo Git. Não os publique.
+
+## Como o pipeline funciona
+
+```mermaid
+flowchart LR
+    A[application_train.csv] --> B[Preparação e contrato Pandera]
+    B --> C[Separação treino e holdout]
+    C --> D[Baseline scikit-learn]
+    C --> E[Simulação de produção]
+    D --> F[Métricas de classificação]
+    E --> F
+    E --> G[KS, PSI e relatório Evidently]
+    F --> H[metrics.json e painel Streamlit]
+    G --> I[HTML e drift_statistics.csv]
+```
+
+Usamos só a tabela principal do Home Credit para manter o experimento reproduzível sem agregar várias tabelas relacionadas. O conjunto original não representa uma sequência temporal de produção. Por isso, o pipeline separa um holdout aleatório e altera nele algumas distribuições e a regra que gera o resultado. O drift observado é intencional e serve para demonstrar o monitoramento.
+
+### Análise causal do cenário
+
+A hipótese de trabalho é que a capacidade de pagamento influencia a inadimplência. Renda, valor do crédito e anuidade são medidas relacionadas a essa capacidade, mas a relação também depende de fatores que não estão representados por completo neste recorte, como outras dívidas, despesas, estabilidade de emprego e condições econômicas.
+
+```mermaid
+graph LR
+    M[Condições econômicas não observadas] --> I[Renda disponível]
+    M --> Y[Inadimplência]
+    A[Idade e perfil do cliente] --> I
+    A --> Y
+    P[Política de concessão] --> C[Valor do crédito]
+    P --> N[Anuidade]
+    I --> B[Comprometimento da renda]
+    C --> B
+    N --> B
+    B --> Y
+```
+
+O diagrama é uma hipótese causal para orientar a interpretação, não algo estimado pelo dataset. O arquivo usado é observacional e não contém uma série histórica de condições econômicas que permita isolar o efeito de uma crise. Além disso, o modelo usa um recorte de features e não inclui todas as variáveis do diagrama. Portanto, associações encontradas pelo classificador não demonstram que uma variável causou a inadimplência.
+
+Na simulação, separamos dois tipos de mudança:
+
+- **Data drift:** multiplicamos `AMT_INCOME_TOTAL` por `1.30`, `AMT_CREDIT` por `1.18` e `AMT_ANNUITY` por `1.12`. Essa intervenção muda as distribuições de entrada. Por si só, ela não prova que o risco aumentou; inclusive, essas proporções reduzem os valores de crédito e anuidade em relação à renda.
+- **Concept drift:** reamostramos `TARGET` com uma nova regra. No logito da probabilidade, somamos `0.85` ao risco base, `0.80` para clientes na faixa inferior de 35% da renda e `0.35` para clientes com menos de 30 anos. O acréscimo fixo representa um choque econômico não observado; os outros termos simulam impacto diferente entre grupos.
+
+Assim, o aumento da inadimplência e a queda de desempenho no relatório são efeitos do mecanismo que definimos para a simulação. Não são uma estimativa causal extraída dos clientes do Home Credit. Para investigar causalidade com dados reais, seria necessário definir uma pergunta e um desenho de estudo, incorporar variáveis econômicas ao longo do tempo e avaliar fatores de confusão antes de atribuir o resultado a renda, crédito ou idade.
 
 ## 3. Executar a demonstração do contrato
 
@@ -132,18 +176,9 @@ O Streamlit imprime um endereço local (normalmente `http://localhost:8501`). O 
 
 Os limites são demonstrativos e dependem de tamanho de amostra, frequência de monitoramento e custo de falsos alertas. Em produção, deveriam ser calibrados com validação de negócio.
 
-## Reprodutibilidade e histórico
+## Reprodutibilidade
 
-Use commits pequenos, com mensagens convencionais, por exemplo:
-
-```text
-feat: add pandera data contract
-feat: simulate production drift
-feat: generate evidently monitoring report
-docs: document privacy and model limitations
-```
-
-Com a mesma versão de Python, dataset, dependências e seed (`42`), a preparação e a simulação são reproduzíveis. O relatório HTML contém data/hora da execução e as estatísticas também são salvas em CSV/JSON.
+Com o mesmo arquivo, dependências e seed (`42`), a seleção de linhas e a simulação podem ser repetidas. Cada execução registra data/hora e métricas agregadas. Os relatórios gerados ficam no repositório; o CSV original e os logs locais não.
 
 ## Governança e LGPD
 
@@ -159,6 +194,6 @@ Consulte [docs/GOVERNANCE.md](docs/GOVERNANCE.md) para finalidade, minimização
 ## Limitações conhecidas
 
 - A tabela do Kaggle não traz uma série temporal adequada para observar drift real; as duas populações são criadas por simulação controlada.
-- O conceito de produção é ressampleado para fins didáticos e não é um resultado real futuro.
+- Os resultados de produção são reamostrados para fins didáticos; não representam clientes futuros reais.
 - A seleção de features é intencionalmente pequena para manter o baseline e a explicação gerenciáveis.
 - A métrica agregada não avalia justiça por grupo nem torna o modelo apto para uso real.

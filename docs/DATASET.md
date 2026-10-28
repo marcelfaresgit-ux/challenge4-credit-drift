@@ -17,7 +17,7 @@ Alternativamente, baixe `application_train.csv` pela interface web do Kaggle e s
 
 ## Recorte usado
 
-O pipeline carrega os campos necessários, deriva idade a partir de `DAYS_BIRTH`, remove linhas sem valores nas features selecionadas e limita a execução local a 60.000 linhas por padrão. O dataset fonte possui bem mais que o mínimo de 5.000 amostras solicitado; o recorte torna os experimentos leves em um computador pessoal. O argumento `--rows` permite alterar o limite.
+O pipeline carrega os campos necessários, deriva idade a partir de `DAYS_BIRTH`, remove linhas sem valores nas features selecionadas e limita a execução local a 60.000 linhas por padrão. O arquivo original supera o mínimo de 5.000 amostras solicitado; o recorte mantém os experimentos leves em um computador pessoal. O argumento `--rows` permite alterar o limite.
 
 Features utilizadas: gênero, renda, valor do crédito, anuidade, idade e tamanho da família. `SK_ID_CURR` serve apenas para identificar duplicatas e não entra no modelo. `TARGET` é usado como rótulo e nunca como feature.
 
