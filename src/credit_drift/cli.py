@@ -1,7 +1,7 @@
 import argparse
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from credit_drift.config import LOGS_DIR
 from credit_drift.monitoring import demonstrate_contract_failure, run_pipeline
@@ -22,7 +22,7 @@ def main():
         LOGS_DIR.mkdir(parents=True, exist_ok=True)
         event = {
             "event": "pipeline_failed",
-            "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+            "timestamp_utc": datetime.now(UTC).isoformat(),
             "command": args.command,
             "error_type": type(exc).__name__,
             "error": str(exc),

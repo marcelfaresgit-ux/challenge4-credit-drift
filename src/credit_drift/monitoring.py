@@ -3,9 +3,8 @@ from __future__ import annotations
 import json
 import logging
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-import pandas as pd
 from evidently import Report
 from evidently.presets import DataDriftPreset
 
@@ -50,7 +49,7 @@ def run_pipeline(max_rows: int = 60000) -> dict:
     )
     snapshot.save_html(str(REPORTS_DIR / "evidently_data_drift.html"))
 
-    timestamp = datetime.now(timezone.utc).isoformat()
+    timestamp = datetime.now(UTC).isoformat()
     metrics = {
         "timestamp_utc": timestamp,
         "dataset": "Home Credit Default Risk / application_train.csv",
@@ -70,7 +69,8 @@ def run_pipeline(max_rows: int = 60000) -> dict:
     )
     LOGS_DIR.mkdir(parents=True, exist_ok=True)
     with (LOGS_DIR / "pipeline_events.jsonl").open("a", encoding="utf-8") as stream:
-        stream.write(json.dumps({"event": "pipeline_completed", **metrics}, ensure_ascii=False) + "\n")
+        event = json.dumps({"event": "pipeline_completed", **metrics}, ensure_ascii=False)
+        stream.write(event + "\n")
     logger.info("Pipeline concluido: %s", json.dumps(metrics, ensure_ascii=False))
     return metrics
 
@@ -88,7 +88,7 @@ def demonstrate_contract_failure() -> str:
         event = {
             "event": "contract_rejected_invalid_batch",
             "rows": int(len(sample)),
-            "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+            "timestamp_utc": datetime.now(UTC).isoformat(),
             "error_type": type(exc).__name__,
         }
         with (LOGS_DIR / "pipeline_events.jsonl").open("a", encoding="utf-8") as stream:

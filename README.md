@@ -75,6 +75,23 @@ O lote de exemplo inclui idade inválida, renda negativa e anuidade nula. Pander
 .\scripts\demo_contract.ps1
 ```
 
+## Testes automatizados e lint
+
+Os testes unitários usam um pequeno conjunto sintético e não dependem de baixar o Kaggle:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\ruff.exe check .
+```
+
+Ou rode os dois em sequência pelo atalho do projeto:
+
+```powershell
+.\scripts\run_checks_windows.ps1
+```
+
+Eles cobrem aceitação/rejeição do contrato, transformação básica do arquivo, treino e métricas do modelo e cálculos da simulação de drift. O pipeline completo com o dataset Kaggle precisa ser executado separadamente depois de baixar `application_train.csv`.
+
 ## 4. Rodar treino, simulação e monitoramento
 
 ```powershell

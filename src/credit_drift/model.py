@@ -20,6 +20,13 @@ def build_model():
          ("categorical", categorical, CATEGORICAL_FEATURES)]
     )
     return Pipeline(
-        [("preprocessing", preprocessing),
-         ("classifier", LogisticRegression(max_iter=1000, class_weight="balanced", random_state=42))]
+        [
+            ("preprocessing", preprocessing),
+            (
+                "classifier",
+                LogisticRegression(
+                    max_iter=1000, class_weight="balanced", random_state=42
+                ),
+            ),
+        ]
     )

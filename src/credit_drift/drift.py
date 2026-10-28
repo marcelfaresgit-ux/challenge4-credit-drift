@@ -5,7 +5,7 @@ import pandas as pd
 from scipy.stats import ks_2samp
 from sklearn.metrics import brier_score_loss, roc_auc_score
 
-from credit_drift.config import FEATURES, NUMERIC_FEATURES
+from credit_drift.config import NUMERIC_FEATURES
 
 
 def simulate_production(reference: pd.DataFrame, seed: int = 42) -> pd.DataFrame:
