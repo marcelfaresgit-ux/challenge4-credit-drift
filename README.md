@@ -184,13 +184,6 @@ Com o mesmo arquivo, dependências e seed (`42`), a seleção de linhas e a simu
 
 Consulte [docs/GOVERNANCE.md](docs/GOVERNANCE.md) para finalidade, minimização, retenção, limites de privacidade, vieses e pontos que exigiriam análise jurídica numa operação real. A origem e os limites do dataset estão em [docs/DATASET.md](docs/DATASET.md).
 
-## Roteiro sugerido para o vídeo STAR (até 5 minutos)
-
-1. **Situation (40 s):** degradação silenciosa de um modelo de crédito e impacto potencial.
-2. **Task (40 s):** validar entradas, detectar drift, registrar saúde e documentar privacidade.
-3. **Action (2 min 20 s):** mostrar o contrato rejeitando o lote; explicar baseline e separação de referência/produção; rodar a simulação e abrir HTML/painel.
-4. **Result (1 min 20 s):** apontar features alteradas, alertas KS/PSI, mudança de métricas e limitações da simulação.
-
 ## Limitações conhecidas
 
 - A tabela do Kaggle não traz uma série temporal adequada para observar drift real; as duas populações são criadas por simulação controlada.
