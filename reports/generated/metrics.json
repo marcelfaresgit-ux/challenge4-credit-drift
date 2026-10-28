@@ -1,0 +1,20 @@
+{
+  "timestamp_utc": "2026-10-28T16:44:16.248333+00:00",
+  "dataset": "Home Credit Default Risk / application_train.csv",
+  "rows_loaded_after_contract_preparation": 60000,
+  "reference_rows": 45000,
+  "production_rows": 15000,
+  "reference_default_rate": 0.07968888888888889,
+  "production_default_rate": 0.22486666666666666,
+  "baseline_metrics": {
+    "roc_auc": 0.5970796670204239,
+    "brier_score": 0.24111815920560284
+  },
+  "production_metrics": {
+    "roc_auc": 0.5160518529932437,
+    "brier_score": 0.24556210559683675
+  },
+  "drifted_feature_tests": 4,
+  "pipeline_duration_seconds": 4.71,
+  "validation_status": "passed"
+}

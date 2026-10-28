@@ -38,7 +38,12 @@ right.dataframe(drift, use_container_width=True, hide_index=True)
 
 report = REPORTS / "evidently_data_drift.html"
 if report.exists():
-    st.link_button("Abrir relatório HTML do Evidently", "file://" + str(report))
+    st.download_button(
+        "Baixar relatório HTML do Evidently",
+        data=report.read_bytes(),
+        file_name=report.name,
+        mime="text/html",
+    )
 st.caption(
     "Data/concept drift da produção é simulado; os dados originais "
     "não contêm uma série temporal."

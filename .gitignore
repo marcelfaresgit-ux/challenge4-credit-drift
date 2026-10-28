@@ -14,6 +14,9 @@ data/artifacts/*
 !data/artifacts/.gitkeep
 reports/generated/*
 !reports/generated/.gitkeep
+!reports/generated/evidently_data_drift.html
+!reports/generated/drift_statistics.csv
+!reports/generated/metrics.json
 logs/*
 !logs/.gitkeep
 *.joblib
