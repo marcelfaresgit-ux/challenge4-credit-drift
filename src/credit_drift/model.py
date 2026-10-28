@@ -4,10 +4,10 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-from credit_drift.config import CATEGORICAL_FEATURES, NUMERIC_FEATURES
+from credit_drift.config import CATEGORICAL_FEATURES, NUMERIC_FEATURES, RANDOM_STATE
 
 
-def build_model():
+def build_model() -> Pipeline:
     numeric = Pipeline(
         [("imputer", SimpleImputer(strategy="median")), ("scale", StandardScaler())]
     )
@@ -25,7 +25,9 @@ def build_model():
             (
                 "classifier",
                 LogisticRegression(
-                    max_iter=1000, class_weight="balanced", random_state=42
+                    max_iter=1000,
+                    class_weight="balanced",
+                    random_state=RANDOM_STATE,
                 ),
             ),
         ]

@@ -1,7 +1,13 @@
+import pandas as pd
 import pandera.pandas as pa
 from pandera import Check
 
 from credit_drift.config import FEATURES
+
+
+def _features_have_no_nulls(frame: pd.DataFrame) -> bool:
+    return bool(frame[FEATURES].notna().all().all())
+
 
 FEATURE_SCHEMA = pa.DataFrameSchema(
     {
@@ -12,13 +18,13 @@ FEATURE_SCHEMA = pa.DataFrameSchema(
         "AGE_YEARS": pa.Column(float, Check.in_range(18, 100), nullable=False),
         "CNT_FAM_MEMBERS": pa.Column(float, Check.in_range(1, 20), nullable=False),
     },
-    checks=[Check(lambda df: df[FEATURES].notna().all().all(), error="Features contain nulls")],
+    checks=[Check(_features_have_no_nulls, error="Há valores nulos nas features")],
     strict=True,
     coerce=True,
     name="credit_application_feature_contract",
 )
 
 
-def validate_features(frame):
-    """Validate the feature contract; raises a Pandera SchemaError on violations."""
+def validate_features(frame: pd.DataFrame) -> pd.DataFrame:
+    """Valida as features e levanta um erro Pandera quando alguma regra falha."""
     return FEATURE_SCHEMA.validate(frame, lazy=True)

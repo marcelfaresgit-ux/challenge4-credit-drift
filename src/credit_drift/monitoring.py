@@ -7,8 +7,9 @@ from datetime import UTC, datetime
 
 from evidently import Report
 from evidently.presets import DataDriftPreset
+from pandera.errors import SchemaErrors
 
-from credit_drift.config import FEATURES, LOGS_DIR, REPORTS_DIR
+from credit_drift.config import FEATURES, LOGS_DIR, RANDOM_STATE, REPORTS_DIR
 from credit_drift.contracts import validate_features
 from credit_drift.data import load_applications
 from credit_drift.drift import calculate_drift, classification_metrics, simulate_production
@@ -17,16 +18,15 @@ from credit_drift.model import build_model
 logger = logging.getLogger("credit_drift")
 
 
-def run_pipeline(max_rows: int = 60000) -> dict:
+def run_pipeline(max_rows: int = 60000) -> dict[str, object]:
     start = time.perf_counter()
-    for directory in (REPORTS_DIR,):
-        directory.mkdir(parents=True, exist_ok=True)
+    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
     applications = load_applications(max_rows=max_rows)
     features = applications[FEATURES]
     validate_features(features)
 
-    # A deterministic split represents a clean reference population and a later production batch.
-    ordered = applications.sample(frac=1, random_state=42).reset_index(drop=True)
+    # Use a repeatable holdout, then simulate a later production batch from it.
+    ordered = applications.sample(frac=1, random_state=RANDOM_STATE).reset_index(drop=True)
     cut = int(len(ordered) * 0.75)
     reference, holdout = ordered.iloc[:cut].copy(), ordered.iloc[cut:].copy()
     model = build_model()
@@ -71,19 +71,19 @@ def run_pipeline(max_rows: int = 60000) -> dict:
     with (LOGS_DIR / "pipeline_events.jsonl").open("a", encoding="utf-8") as stream:
         event = json.dumps({"event": "pipeline_completed", **metrics}, ensure_ascii=False)
         stream.write(event + "\n")
-    logger.info("Pipeline concluido: %s", json.dumps(metrics, ensure_ascii=False))
+    logger.info("Pipeline concluído: %s", json.dumps(metrics, ensure_ascii=False))
     return metrics
 
 
 def demonstrate_contract_failure() -> str:
-    """Inject representative bad rows and return the contract failure summary."""
+    """Insere erros de exemplo e devolve o resumo da rejeição do contrato."""
     sample = load_applications(max_rows=100)[FEATURES].copy().reset_index(drop=True)
     sample.loc[0, "AGE_YEARS"] = 16
     sample.loc[1, "AMT_INCOME_TOTAL"] = -1
     sample.loc[2, "AMT_ANNUITY"] = float("nan")
     try:
         validate_features(sample)
-    except Exception as exc:
+    except SchemaErrors as exc:
         LOGS_DIR.mkdir(parents=True, exist_ok=True)
         event = {
             "event": "contract_rejected_invalid_batch",
@@ -94,4 +94,4 @@ def demonstrate_contract_failure() -> str:
         with (LOGS_DIR / "pipeline_events.jsonl").open("a", encoding="utf-8") as stream:
             stream.write(json.dumps(event, ensure_ascii=False) + "\n")
         return str(exc)
-    raise RuntimeError("O contrato deveria ter bloqueado o lote com dados invalidos.")
+    raise RuntimeError("O contrato deveria ter bloqueado o lote com dados inválidos.")

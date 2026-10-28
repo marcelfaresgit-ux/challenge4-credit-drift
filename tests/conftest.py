@@ -6,7 +6,7 @@ from credit_drift.config import FEATURES
 
 
 @pytest.fixture
-def credit_frame():
+def credit_frame() -> pd.DataFrame:
     rng = np.random.default_rng(17)
     rows = 300
     credit = rng.uniform(10000, 200000, rows)
