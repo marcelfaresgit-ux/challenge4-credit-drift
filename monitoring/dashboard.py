@@ -28,11 +28,26 @@ if EVENTS.exists():
         except json.JSONDecodeError:
             continue
 
+execution_events = [
+    event for event in events
+    if event.get("event") in {"pipeline_completed", "pipeline_failed"}
+]
+current_status = metrics["validation_status"]
+if execution_events:
+    latest_execution = max(execution_events, key=lambda event: event["timestamp_utc"])
+    current_status = latest_execution.get(
+        "status", "failed" if latest_execution["event"] == "pipeline_failed" else "passed"
+    )
+
 col1, col2, col3, col4 = st.columns(4)
-col1.metric("Linhas na referência", f"{metrics['reference_rows']:,}")
-col2.metric("Linhas em produção", f"{metrics['production_rows']:,}")
-col3.metric("Testes com drift", metrics["drifted_feature_tests"])
-col4.metric("Duração do pipeline", f"{metrics['pipeline_duration_seconds']} s")
+col1.metric("Status da execução", current_status)
+col2.metric("Volume processado", f"{metrics['rows_loaded_after_contract_preparation']:,}")
+col3.metric("Alertas de drift", metrics["drifted_feature_tests"])
+col4.metric("Latência total", f"{metrics['pipeline_duration_seconds']} s")
+st.caption(
+    f"Lotes: referência {metrics['reference_rows']:,} / produção "
+    f"{metrics['production_rows']:,} · validação {metrics['validation_status']}"
+)
 
 left, right = st.columns(2)
 left.subheader("Saúde do modelo")
@@ -47,7 +62,7 @@ right.dataframe(drift, use_container_width=True, hide_index=True)
 
 st.subheader("Histórico de execuções e alertas")
 completed = pd.DataFrame(
-    event for event in events if event.get("event") == "pipeline_completed"
+    [event for event in events if event.get("event") == "pipeline_completed"]
 )
 if not completed.empty:
     completed["timestamp_utc"] = pd.to_datetime(
@@ -65,6 +80,35 @@ if not completed.empty:
     )
 else:
     st.info("O histórico será exibido após novas execuções do pipeline.")
+
+st.subheader("Etapas de ingestão, transformação e validação")
+stage_events = [
+    event for event in events
+    if event.get("event") in {
+        "ingestion_completed", "transformation_completed",
+        "validation_completed", "drift_analysis_completed",
+    }
+]
+if stage_events:
+    stages = pd.DataFrame(stage_events)
+    stages["timestamp_utc"] = pd.to_datetime(
+        stages["timestamp_utc"], utc=True, errors="coerce"
+    )
+    display_columns = [
+        column for column in [
+            "timestamp_utc", "event", "status", "rows", "rows_in",
+            "rows_after_cleaning", "rows_after_deduplication", "rows_out",
+            "rows_reference", "rows_production", "tests_run",
+            "drifted_feature_tests", "duration_seconds",
+        ] if column in stages
+    ]
+    st.dataframe(
+        stages[display_columns].sort_values("timestamp_utc", ascending=False),
+        use_container_width=True,
+        hide_index=True,
+    )
+else:
+    st.info("As etapas serão registradas na próxima execução do pipeline.")
 
 st.subheader("Falhas e rejeições de validação")
 validation_events = [

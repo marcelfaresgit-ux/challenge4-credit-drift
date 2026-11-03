@@ -1,9 +1,7 @@
 import argparse
-import json
 import logging
-from datetime import UTC, datetime
 
-from credit_drift.config import LOGS_DIR
+from credit_drift.events import record_event
 from credit_drift.monitoring import demonstrate_contract_failure, run_pipeline
 
 
@@ -25,16 +23,13 @@ def main() -> None:
         else:
             print(run_pipeline(max_rows=args.rows))
     except Exception as exc:
-        LOGS_DIR.mkdir(parents=True, exist_ok=True)
-        event = {
-            "event": "pipeline_failed",
-            "timestamp_utc": datetime.now(UTC).isoformat(),
-            "command": args.command,
-            "error_type": type(exc).__name__,
-            "error": str(exc),
-        }
-        with (LOGS_DIR / "pipeline_events.jsonl").open("a", encoding="utf-8") as stream:
-            stream.write(json.dumps(event, ensure_ascii=False) + "\n")
+        record_event(
+            "pipeline_failed",
+            command=args.command,
+            error_type=type(exc).__name__,
+            error=str(exc),
+            status="failed",
+        )
         logging.exception("Execução falhou")
         raise
 

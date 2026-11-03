@@ -16,5 +16,8 @@ def test_contract_rejects_invalid_age_income_and_missing_value(credit_frame):
     invalid.loc[1, "AMT_INCOME_TOTAL"] = -1
     invalid.loc[2, "AMT_ANNUITY"] = float("nan")
 
-    with pytest.raises(SchemaErrors):
+    with pytest.raises(SchemaErrors) as error:
         validate_features(invalid)
+
+    failed_columns = set(error.value.failure_cases["column"].dropna())
+    assert {"AGE_YEARS", "AMT_INCOME_TOTAL", "AMT_ANNUITY"} <= failed_columns
