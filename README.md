@@ -111,7 +111,7 @@ Assim, o aumento da inadimplência e a queda de desempenho no relatório são ef
 
 ## 3. Executar a demonstração do contrato
 
-O lote de exemplo inclui idade inválida, renda negativa e anuidade nula. Pandera deve rejeitá-lo:
+O lote sintético de quatro linhas inclui idade fora da faixa, renda negativa e anuidade nula. Ele não depende do CSV do Kaggle. Pandera deve rejeitá-lo e o comando informa as regras violadas; o evento sem linhas pessoais é registrado em `logs/pipeline_events.jsonl`:
 
 ```powershell
 .\scripts\demo_contract.ps1
@@ -132,7 +132,7 @@ Ou rode os dois em sequência pelo atalho do projeto:
 .\scripts\run_checks_windows.ps1
 ```
 
-Eles cobrem aceitação/rejeição do contrato, transformação básica do arquivo, treino e métricas do modelo e cálculos da simulação de drift. O pipeline completo com o dataset Kaggle precisa ser executado separadamente depois de baixar `application_train.csv`.
+Eles cobrem aceitação/rejeição do contrato, identificação das regras inválidas, transformação básica do arquivo, treino e métricas do modelo e cálculo do PSI inclusive para valores fora da faixa de referência. O pipeline completo com o dataset Kaggle precisa ser executado separadamente depois de baixar `application_train.csv`.
 
 ## 4. Rodar treino, simulação e monitoramento
 
@@ -152,7 +152,11 @@ Arquivos gerados em `reports/generated/`:
 - `drift_statistics.csv`: estatística KS e PSI por variável numérica.
 - `metrics.json`: métricas de classificação, tamanho dos lotes, taxa do alvo, quantidade de alertas e duração.
 
-Eventos de execução, rejeições do contrato e falhas ficam em `logs/pipeline_events.jsonl`.
+Eventos de ingestão, transformação, validação, análise de drift, conclusão, rejeições do contrato e falhas ficam em `logs/pipeline_events.jsonl`, com horário UTC, volume e duração da etapa quando aplicável. O painel integra esses eventos ao histórico. As métricas operacionais incluem status, volume processado, latência total e quantidade de alertas; as métricas por etapa ajudam a localizar gargalos.
+
+### Evidência da execução local
+
+Na execução registrada em `metrics.json`, foram lidas 307.511 linhas do CSV; após limpeza e amostragem, 60.000 seguiram para o experimento (45.000 de referência e 15.000 de produção simulada). O PSI contabilizou os 45.000 e 15.000 registros em todas as cinco features numéricas. `AMT_INCOME_TOTAL` ultrapassou o limiar PSI de 0,2 (0,3095); as demais features ficaram abaixo. A demonstração Pandera rejeitou o lote sintético e identificou idade fora da faixa, renda não positiva e valor de anuidade nulo. A validação da execução real passou; o pipeline levou cerca de 3,2 segundos e registrou quatro alertas estatísticos no total.
 
 ## 5. Abrir o painel
 
@@ -180,7 +184,11 @@ Com o mesmo arquivo, dependências e seed (`42`), a seleção de linhas e a simu
 
 ## Governança e LGPD
 
-Consulte [docs/GOVERNANCE.md](docs/GOVERNANCE.md) para finalidade, minimização, retenção, limites de privacidade, vieses e pontos que exigiriam análise jurídica numa operação real. A origem e os limites do dataset estão em [docs/DATASET.md](docs/DATASET.md).
+Este projeto acadêmico usa localmente um dataset público de competição; não recebe dados de clientes próprios nem toma decisões de crédito reais. O art. 7º, X, da LGPD é discutido como hipótese possível para uma operação real de proteção ao crédito, sujeita à necessidade, transparência, direitos dos titulares e salvaguardas, mas não é apresentado como fundamento automático para o dataset deste exercício. O CSV bruto, cópias intermediárias e logs locais devem ser removidos em até 30 dias após a conclusão da atividade; o repositório contém somente código e resultados agregados. Consulte [docs/GOVERNANCE.md](docs/GOVERNANCE.md) para os detalhes de tratamento, segurança, retenção e uso responsável.
+
+### Hipótese causal e limitações
+
+A simulação altera distribuições de renda/crédito/anuidade e reamostra o resultado com uma regra de risco definida no código. Isso demonstra como o monitoramento reage a mudanças conhecidas, não estima efeitos causais dos clientes do Home Credit. Dívidas, despesas, estabilidade e setor de emprego, educação, região, política de concessão e condições macroeconômicas podem confundir associações. O dataset não traz uma série temporal para isolar esses fatores. Veja o diagrama e as hipóteses completas na seção [Análise causal do cenário](#análise-causal-do-cenário).
 
 ## Limitações conhecidas
 
