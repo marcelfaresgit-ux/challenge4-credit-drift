@@ -33,3 +33,16 @@ def test_drift_statistics_report_ks_and_psi(credit_frame):
     assert {"Kolmogorov-Smirnov", "PSI"} <= set(result["test"])
     assert "AMT_INCOME_TOTAL" in set(result["feature"])
     assert result["statistic"].notna().all()
+
+
+def test_psi_counts_production_values_outside_reference_limits(credit_frame):
+    production = credit_frame[FEATURES].copy()
+    production["AMT_INCOME_TOTAL"] = credit_frame["AMT_INCOME_TOTAL"].max() * 2
+
+    result = calculate_drift(credit_frame[FEATURES], production)
+    income_psi = result.loc[
+        (result["feature"] == "AMT_INCOME_TOTAL") & (result["test"] == "PSI")
+    ].iloc[0]
+
+    assert income_psi["statistic"] > 0.2
+    assert income_psi["drift_detected"]

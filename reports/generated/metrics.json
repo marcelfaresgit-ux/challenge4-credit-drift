@@ -1,6 +1,7 @@
 {
-  "timestamp_utc": "2026-10-28T16:57:16.966073+00:00",
+  "timestamp_utc": "2026-11-03T16:32:55.767597+00:00",
   "dataset": "Home Credit Default Risk / application_train.csv",
+  "rows_read_from_source": 307511,
   "rows_loaded_after_contract_preparation": 60000,
   "reference_rows": 45000,
   "production_rows": 15000,
@@ -15,6 +16,6 @@
     "brier_score": 0.24556210559683675
   },
   "drifted_feature_tests": 4,
-  "pipeline_duration_seconds": 3.305,
+  "pipeline_duration_seconds": 3.242,
   "validation_status": "passed"
 }

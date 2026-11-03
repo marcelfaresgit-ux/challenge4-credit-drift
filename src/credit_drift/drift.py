@@ -50,6 +50,8 @@ def calculate_drift(
                 "statistic": result.statistic,
                 "p_value": result.pvalue,
                 "drift_detected": bool(result.pvalue < KS_P_VALUE_THRESHOLD),
+                "reference_count": int(reference[column].notna().sum()),
+                "production_count": int(production[column].notna().sum()),
             }
         )
         # Quantis internos definem as faixas; caudas infinitas retêm valores fora
@@ -61,6 +63,12 @@ def calculate_drift(
         if len(edges) > 2:
             ref_counts = np.histogram(reference[column], bins=edges)[0].astype(float)
             cur_counts = np.histogram(production[column], bins=edges)[0].astype(float)
+            reference_count = int(ref_counts.sum())
+            production_count = int(cur_counts.sum())
+            if reference_count != int(reference[column].notna().sum()):
+                raise ValueError(f"O PSI descartou registros da referência em {column}.")
+            if production_count != int(production[column].notna().sum()):
+                raise ValueError(f"O PSI descartou registros de produção em {column}.")
             ref_share = (ref_counts + 1e-6) / (ref_counts.sum() + 1e-6 * len(ref_counts))
             cur_share = (cur_counts + 1e-6) / (cur_counts.sum() + 1e-6 * len(cur_counts))
             psi = float(np.sum((cur_share - ref_share) * np.log(cur_share / ref_share)))
@@ -71,6 +79,8 @@ def calculate_drift(
                     "statistic": psi,
                     "p_value": np.nan,
                     "drift_detected": bool(psi >= PSI_THRESHOLD),
+                    "reference_count": reference_count,
+                    "production_count": production_count,
                 }
             )
     return pd.DataFrame(rows)
