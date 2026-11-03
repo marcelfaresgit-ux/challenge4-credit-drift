@@ -100,7 +100,7 @@ graph LR
     B --> Y
 ```
 
-O diagrama é uma hipótese causal para orientar a interpretação, não algo estimado pelo dataset. O arquivo usado é observacional e não contém uma série histórica de condições econômicas que permita isolar o efeito de uma crise. Além disso, o modelo usa um recorte de features e não inclui todas as variáveis do diagrama. Portanto, associações encontradas pelo classificador não demonstram que uma variável causou a inadimplência.
+O diagrama é uma hipótese causal para orientar a interpretação, não algo estimado pelo dataset. O arquivo usado é observacional e não contém uma série histórica de condições econômicas que permita isolar o efeito de uma crise. Possíveis confundidores incluem dívidas e despesas não observadas, estabilidade e setor de emprego, educação, região, política histórica de concessão e condições macroeconômicas. O modelo usa um recorte de features e não mede esses fatores adequadamente; portanto, associações encontradas pelo classificador não demonstram que uma variável causou a inadimplência. A simulação conhece seu mecanismo por construção, mas isso não valida a hipótese para clientes reais.
 
 Na simulação, separamos dois tipos de mudança:
 
@@ -162,7 +162,7 @@ Depois de executar o pipeline:
 .\monitoring\run_dashboard.ps1
 ```
 
-O Streamlit imprime um endereço local (normalmente `http://localhost:8501`). O painel exibe volumes, duração, número de testes com drift, taxas do alvo e métricas ROC AUC/Brier de referência e produção.
+O Streamlit imprime um endereço local (normalmente `http://localhost:8501`). O painel exibe volumes, duração, número de testes com drift, taxas do alvo e métricas ROC AUC/Brier de referência e produção. Também apresenta o histórico de execuções concluídas, a evolução dos alertas e eventos de falha ou rejeição de validação, com horários em UTC, a partir do log local.
 
 ## Como interpretar os alertas
 

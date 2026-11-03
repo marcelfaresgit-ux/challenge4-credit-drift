@@ -14,11 +14,15 @@ Este repositório é um exercício acadêmico de observabilidade de um classific
 
 ## Base legal e LGPD
 
-O enunciado solicita que a equipe discuta base legal, retenção e privacidade. Para este trabalho, descrevemos princípios e controles hipotéticos; não há tratamento de dados de clientes próprios e este README não constitui parecer jurídico. Em uma operação real, a hipótese legal aplicável a decisões de crédito deve ser avaliada pelo controlador com jurídico/encarregado, finalidade, necessidade, transparência e salvaguardas pertinentes, incluindo análise de vieses e mecanismos de revisão.
+O art. 7º, X, da LGPD prevê o tratamento de dados pessoais para proteção do crédito, observada a legislação pertinente. Em uma operação real de análise de risco ou decisão de crédito, essa hipótese pode ser considerada quando o tratamento for necessário e diretamente ligado à proteção do crédito. A base legal não autoriza qualquer coleta ou uso: continuam aplicáveis os princípios da LGPD, os direitos dos titulares, a transparência, a qualidade e segurança dos dados, e as salvaguardas contra discriminação e decisões inadequadas. O controlador deve documentar finalidade, necessidade, categorias de dados, compartilhamentos e retenção, e avaliar o caso com o encarregado e assessoria jurídica.
+
+Neste projeto acadêmico, o art. 7º, X, é discutido como hipótese para o cenário fictício de análise de crédito, não como fundamento jurídico do tratamento que realizamos. O arquivo é um dataset público de competição, usado localmente para demonstrar modelagem e monitoramento; não recebemos dados de clientes da fintech fictícia nem fazemos decisões reais. O uso do dataset continua sujeito às regras da competição e não torna automaticamente aplicável essa hipótese legal.
 
 ## Retenção e segurança
 
-Manter arquivos locais apenas pelo tempo necessário à atividade acadêmica; remover credenciais e dados ao concluir. Restringir acesso à máquina e não publicar dados em issues, notebooks ou artefatos. Os scripts não enviam dados a serviços externos além do download iniciado pelo usuário na Kaggle.
+O arquivo bruto `data/raw/application_train.csv` e quaisquer cópias intermediárias ficam somente na máquina local e devem ser removidos até 30 dias após a conclusão da atividade. O mesmo prazo vale para logs de execução em `logs/` e relatórios locais temporários. Ao encerrar o projeto, descarte-os apagando esses arquivos e esvaziando a lixeira; remova também credenciais Kaggle conforme as instruções da plataforma. O prazo é uma regra operacional deste exercício, não uma obrigação legal universal.
+
+O repositório mantém apenas código, documentação e resultados agregados versionados (`metrics.json`, `drift_statistics.csv` e relatório Evidently), sem linhas individuais do dataset. Esses artefatos podem permanecer no repositório acadêmico enquanto ele for necessário para avaliação; ao arquivar ou tornar o repositório privado/removê-lo, apague o histórico e os artefatos se a retenção deixar de ser necessária. Restringir acesso à máquina e não publicar dados ou credenciais em issues, notebooks ou artefatos. O pipeline não envia dados a serviços externos; o download Kaggle é iniciado pelo usuário.
 
 ## Vieses e explicabilidade
 
@@ -26,4 +30,4 @@ O dataset contém atributos demográficos e proxies socioeconômicos. Eles podem
 
 ## Retenção do projeto
 
-`data/raw/`, resultados intermediários e logs locais são ignorados pelo Git. Apenas o relatório de drift e métricas agregadas ficam versionados; não incluem registros de clientes. O README e este documento registram finalidade, campos, processamento e limitações para que a avaliação seja reproduzível sem publicar linhas individuais.
+`data/raw/`, resultados intermediários e logs locais são ignorados pelo Git. Apenas o relatório de drift e métricas agregadas ficam versionados; não incluem registros de clientes. Os arquivos locais brutos, intermediários e logs são descartados em até 30 dias após a conclusão da atividade. O README e este documento registram finalidade, campos, processamento e limitações para que a avaliação seja reproduzível sem publicar linhas individuais.
