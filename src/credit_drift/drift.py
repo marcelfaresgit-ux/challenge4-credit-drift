@@ -52,8 +52,12 @@ def calculate_drift(
                 "drift_detected": bool(result.pvalue < KS_P_VALUE_THRESHOLD),
             }
         )
-        # Calcula o PSI com faixas definidas pelos quantis da população de referência.
-        edges = np.unique(np.quantile(reference[column], np.linspace(0, 1, 11)))
+        # Quantis internos definem as faixas; caudas infinitas retêm valores fora
+        # do intervalo observado na referência, sem descartá-los dos histogramas.
+        internal_edges = np.unique(
+            np.quantile(reference[column], np.linspace(0.1, 0.9, 9))
+        )
+        edges = np.concatenate(([-np.inf], internal_edges, [np.inf]))
         if len(edges) > 2:
             ref_counts = np.histogram(reference[column], bins=edges)[0].astype(float)
             cur_counts = np.histogram(production[column], bins=edges)[0].astype(float)
