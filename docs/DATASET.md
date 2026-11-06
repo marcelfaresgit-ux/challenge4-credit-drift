@@ -10,7 +10,7 @@ O projeto utiliza somente `application_train.csv`, a tabela principal de solicit
 
 1. Crie/acesse sua conta Kaggle, abra a competição e aceite as regras.
 2. Configure a API Kaggle com a credencial da sua própria conta conforme a documentação oficial: <https://github.com/Kaggle/kaggle-api#api-credentials>.
-3. Na raiz do projeto, rode `.\scripts\download_data.ps1`.
+3. Na raiz do projeto, rode `.\scripts\download_data.cmd`.
 4. Confirme que `data/raw/application_train.csv` existe. Essa pasta está ignorada pelo Git.
 
 Alternativamente, baixe `application_train.csv` pela interface web do Kaggle e salve em `data/raw/`.

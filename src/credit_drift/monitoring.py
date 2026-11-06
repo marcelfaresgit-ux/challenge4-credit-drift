@@ -119,6 +119,7 @@ def demonstrate_contract_failure() -> str:
             {
                 f"{row.column}: {row.check}"
                 for row in failures[["column", "check"]].dropna().itertuples(index=False)
+                if row.column in FEATURES
             }
         )
         record_event(

@@ -15,7 +15,7 @@ st.title("Observabilidade do Credit Scoring")
 st.caption("Painel local para métricas operacionais, performance e drift do cenário simulado.")
 
 if not METRICS.exists() or not DRIFT.exists():
-    st.info("Execute .\\scripts\\run_pipeline.ps1 para gerar os relatórios e métricas.")
+    st.info("Execute .\\scripts\\run_pipeline.cmd para gerar os relatórios e métricas.")
     st.stop()
 
 metrics = json.loads(METRICS.read_text(encoding="utf-8"))

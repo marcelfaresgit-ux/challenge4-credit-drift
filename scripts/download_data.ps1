@@ -3,13 +3,16 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+if ([string]::IsNullOrWhiteSpace($PSScriptRoot)) {
+  throw "Execute este arquivo .ps1 como script; nao cole suas linhas no prompt. Use scripts\download_data.cmd."
+}
 $root = Split-Path -Parent $PSScriptRoot
 $target = Join-Path $root $Destination
 New-Item -ItemType Directory -Force -Path $target | Out-Null
 
 $kaggle = Join-Path $root ".venv\Scripts\kaggle.exe"
 if (-not (Test-Path -LiteralPath $kaggle)) {
-  throw "Kaggle CLI nao encontrado. Execute .\scripts\setup_windows.ps1 primeiro."
+  throw "Kaggle CLI nao encontrado. Execute .\scripts\setup_windows.cmd primeiro."
 }
 
 Write-Host "Baixando application_train.csv da competicao oficial Home Credit Default Risk..."

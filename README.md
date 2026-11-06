@@ -44,10 +44,12 @@ Este projeto acompanha um classificador simples de risco de crédito desde a val
 Na raiz do projeto:
 
 ```powershell
-.\scripts\setup_windows.ps1
+.\scripts\setup_windows.cmd
 ```
 
-O script cria `.venv` e instala as dependências do projeto, do painel e do cliente Kaggle. Se o PowerShell bloquear scripts nesta sessão, rode:
+O atalho cria `.venv` e instala as dependências do projeto, do painel e do cliente Kaggle. Os arquivos `.cmd` iniciam o script PowerShell com uma política temporária para esse processo; não alteram a configuração permanente do computador. Podem ser chamados de qualquer pasta usando o caminho completo. Não copie as linhas internas de um `.ps1` para o prompt: execute o arquivo `.cmd` inteiro.
+
+Se preferir executar diretamente um `.ps1` e o PowerShell bloquear scripts nesta sessão, rode:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
@@ -60,7 +62,7 @@ O arquivo usado é `application_train.csv`, da competição [Home Credit Default
 Com as credenciais da sua própria conta Kaggle configuradas:
 
 ```powershell
-.\scripts\download_data.ps1
+.\scripts\download_data.cmd
 ```
 
 Também é possível baixar o arquivo pela interface web e salvá-lo em `data/raw/application_train.csv`. O arquivo bruto e as credenciais são ignorados pelo Git. Não os publique.
@@ -114,7 +116,7 @@ Assim, o aumento da inadimplência e a queda de desempenho no relatório são ef
 O lote sintético de quatro linhas inclui idade fora da faixa, renda negativa e anuidade nula. Ele não depende do CSV do Kaggle. Pandera deve rejeitá-lo e o comando informa as regras violadas; o evento sem linhas pessoais é registrado em `logs/pipeline_events.jsonl`:
 
 ```powershell
-.\scripts\demo_contract.ps1
+.\scripts\demo_contract.cmd
 ```
 
 ## Testes automatizados e lint
@@ -129,7 +131,7 @@ Os testes unitários usam um pequeno conjunto sintético e não dependem de baix
 Ou rode os dois em sequência pelo atalho do projeto:
 
 ```powershell
-.\scripts\run_checks_windows.ps1
+.\scripts\run_checks_windows.cmd
 ```
 
 Eles cobrem aceitação/rejeição do contrato, identificação das regras inválidas, transformação básica do arquivo, treino e métricas do modelo e cálculo do PSI inclusive para valores fora da faixa de referência. O pipeline completo com o dataset Kaggle precisa ser executado separadamente depois de baixar `application_train.csv`.
@@ -137,13 +139,13 @@ Eles cobrem aceitação/rejeição do contrato, identificação das regras invá
 ## 4. Rodar treino, simulação e monitoramento
 
 ```powershell
-.\scripts\run_pipeline.ps1
+.\scripts\run_pipeline.cmd
 ```
 
 O padrão usa até 60.000 linhas limpas para manter o experimento leve. Para alterar o limite:
 
 ```powershell
-.\scripts\run_pipeline.ps1 -Rows 100000
+.\scripts\run_pipeline.cmd -Rows 100000
 ```
 
 Arquivos gerados em `reports/generated/`:
@@ -163,7 +165,7 @@ Na execução registrada em `metrics.json`, foram lidas 307.511 linhas do CSV; a
 Depois de executar o pipeline:
 
 ```powershell
-.\monitoring\run_dashboard.ps1
+.\monitoring\run_dashboard.cmd
 ```
 
 O Streamlit imprime um endereço local (normalmente `http://localhost:8501`). O painel exibe volumes, duração, número de testes com drift, taxas do alvo e métricas ROC AUC/Brier de referência e produção. Também apresenta o histórico de execuções concluídas, a evolução dos alertas e eventos de falha ou rejeição de validação, com horários em UTC, a partir do log local.

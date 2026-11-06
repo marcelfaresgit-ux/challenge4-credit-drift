@@ -1,4 +1,7 @@
 $ErrorActionPreference = "Stop"
+if ([string]::IsNullOrWhiteSpace($PSScriptRoot)) {
+  throw "Execute este arquivo .ps1 como script; nao cole suas linhas no prompt. Use scripts\setup_windows.cmd."
+}
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
 
@@ -21,4 +24,4 @@ if (-not (Test-Path -LiteralPath ".venv\Scripts\python.exe")) {
 }
 & .\.venv\Scripts\python.exe -m pip install --upgrade pip
 & .\.venv\Scripts\python.exe -m pip install -e ".[dev,dashboard,kaggle]"
-Write-Host "Ambiente pronto. Proximo passo: .\scripts\download_data.ps1"
+Write-Host "Ambiente pronto. Proximo passo: .\scripts\download_data.cmd"
