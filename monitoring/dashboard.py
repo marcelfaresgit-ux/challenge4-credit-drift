@@ -58,7 +58,7 @@ left.write({"ROC AUC baseline": metrics["baseline_metrics"]["roc_auc"],
             "Taxa alvo referência": metrics["reference_default_rate"],
             "Taxa alvo produção": metrics["production_default_rate"]})
 right.subheader("Testes estatísticos")
-right.dataframe(drift, use_container_width=True, hide_index=True)
+right.dataframe(drift, width="stretch", hide_index=True)
 
 st.subheader("Histórico de execuções e alertas")
 completed = pd.DataFrame(
@@ -75,7 +75,7 @@ if not completed.empty:
         completed[["timestamp_utc", "reference_rows", "production_rows",
                    "drifted_feature_tests", "pipeline_duration_seconds",
                    "validation_status"]],
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
 else:
@@ -104,7 +104,7 @@ if stage_events:
     ]
     st.dataframe(
         stages[display_columns].sort_values("timestamp_utc", ascending=False),
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
 else:
@@ -124,7 +124,7 @@ if validation_events:
         failures[[column for column in
                   ["timestamp_utc", "event", "command", "error_type", "error"]
                   if column in failures]],
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
 else:
